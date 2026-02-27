@@ -9,7 +9,7 @@ import { initRenderer } from "./render.js";
 import { startGameLoop } from "./gameLoop.js";
 
 // ---------- Boot ----------
-const state = createInitialState();
+const state = createInitialState(CONFIG);
 const ui = initUI();
 const renderer = initRenderer(CONFIG);
 
@@ -39,3 +39,4 @@ startGameLoop({
     renderUI(state, ui);
   },
 });
+
