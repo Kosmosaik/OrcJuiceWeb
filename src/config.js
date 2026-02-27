@@ -16,6 +16,9 @@ export const CONFIG = {
     // Configurable tile size (we'll draw the grid scaled by this)
     tileSizePx: 128,
 
+    // Gap between tile and border
+    gapPx: 8,
+
     // Where to place the grid on the canvas
     // (Renderer will interpret this; for now we’ll center it)
     placement: "center", // "center" | "topLeft" (future)
@@ -29,4 +32,5 @@ export const CONFIG = {
     { type: "chest", x: 0, y: 2 },
   ],
 };
+
 
