@@ -9,7 +9,7 @@ import { initRenderer } from "./render.js";
 import { startGameLoop } from "./gameLoop.js";
 
 // ---------- Boot ----------
-const state = createInitialState();
+const state = createInitialState(CONFIG);
 const ui = initUI();
 const renderer = initRenderer(CONFIG);
 
@@ -32,10 +32,12 @@ startGameLoop({
   onUpdate: (dt, { state, config }) => {
     updateTime(state, dt, config, log);
   },
-  onRender: () => {
-    renderer.render();
+  onRender: ({ state, config }) => {
+    renderer.render({ state, config });
   },
   onUI: () => {
     renderUI(state, ui);
   },
 });
+
+

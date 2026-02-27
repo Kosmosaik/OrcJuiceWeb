@@ -1,8 +1,12 @@
+import { createGrid, applyStartingTiles } from "./grid.js";
 // src/state.js
 // Owns the single source of truth (game state) + small state helpers.
 
-export function createInitialState() {
-  return {
+export function createInitialState(config) {
+  const grid = createGrid(config.grid);
+  const warnings = applyStartingTiles(grid, config);
+
+  const initialState = {
     isPaused: false,
 
     // Time (temporary simple version for Milestone 0)
@@ -20,9 +24,19 @@ export function createInitialState() {
       slimeFruit: 0,
     },
 
+    // World
+    world: {
+      grid,
+    },
+
     // Log messages (append-only)
     log: [],
   };
+
+  // Any config warnings go to log
+  for (const w of warnings) initialState.log.push(`⚠️ ${w}`);
+
+  return initialState;
 }
 
 /**
