@@ -19,11 +19,6 @@ export function initRenderer(config) {
     // Clear
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Background label (optional debug text)
-    ctx.fillStyle = "#e6e6e6";
-    ctx.font = "18px system-ui";
-    ctx.fillText("Orcslime MVP", 20, 40);
-
     // Draw grid (if exists)
     const grid = state?.world?.grid;
     if (!grid) return;
@@ -43,13 +38,14 @@ export function initRenderer(config) {
       const x = originX + tile.x * tileSize;
       const y = originY + tile.y * tileSize;
 
-      // Tile background
-      ctx.fillStyle = "#1b1f24";
-      ctx.fillRect(x, y, tileSize, tileSize);
-
-      // Tile border
-      ctx.strokeStyle = "#39424e";
-      ctx.strokeRect(x, y, tileSize, tileSize);
+    // Tile background
+    ctx.fillStyle = "#15191f";
+    ctx.fillRect(x, y, tileSize, tileSize);
+    
+    // Subtle grid line (lighter + thinner feel)
+    ctx.strokeStyle = "rgba(160, 170, 185, 0.18)";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x + 0.5, y + 0.5, tileSize - 1, tileSize - 1);
 
       // Draw placeholder content per tile type
       drawTileContent(ctx, tile, x, y, tileSize);
