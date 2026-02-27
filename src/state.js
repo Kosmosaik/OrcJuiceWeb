@@ -29,6 +29,12 @@ export function createInitialState(config) {
       grid,
     },
 
+    // UI interaction state (Milestone C)
+    ui: {
+      hoveredTile: null,   // {x:number, y:number} | null
+      selectedTile: null,  // {x:number, y:number} | null
+    },
+
     // Log messages (append-only)
     log: [],
   };
