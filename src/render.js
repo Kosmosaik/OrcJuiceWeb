@@ -35,6 +35,8 @@ export function initRenderer(config) {
     if (!grid) return;
 
     const tileSize = config.grid.tileSizePx;
+    const gap = config.grid.gapPx ?? 0;
+    const step = tileSize + gap;
 
     // Compute pixel size of grid
     const gridW = grid.cols * tileSize;
@@ -46,8 +48,8 @@ export function initRenderer(config) {
 
     // Draw tiles
     for (const tile of grid.tiles) {
-      const x = originX + tile.x * tileSize;
-      const y = originY + tile.y * tileSize;
+      const x = tile.x * step;
+      const y = tile.y * step;
 
     // Tile background
     ctx.fillStyle = "#15191f";
