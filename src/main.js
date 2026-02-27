@@ -32,11 +32,12 @@ startGameLoop({
   onUpdate: (dt, { state, config }) => {
     updateTime(state, dt, config, log);
   },
-  onRender: () => {
-    renderer.render();
+  onRender: ({ state, config }) => {
+    renderer.render({ state, config });
   },
   onUI: () => {
     renderUI(state, ui);
   },
 });
+
 
