@@ -17,7 +17,7 @@ export const CONFIG = {
     tileSizePx: 128,
 
     // Gap between tiles
-    gapPx: 8,
+    gapPx: 1,
     
     // Outer padding around the entire grid
     paddingPx: 8,
@@ -35,6 +35,7 @@ export const CONFIG = {
     { type: "chest", x: 0, y: 2 },
   ],
 };
+
 
 
 
