@@ -3,7 +3,7 @@
 
 export const CONFIG = {
   // Canvas/world
-  canvasSizePx: 720,
+  canvasSizePx: 400,
 
   // Tick speed: how many real seconds = one in-game day (MVP default)
   secondsPerGameDay: 1.0,
@@ -29,3 +29,4 @@ export const CONFIG = {
     { type: "chest", x: 0, y: 2 },
   ],
 };
+
