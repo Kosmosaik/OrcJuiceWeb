@@ -9,8 +9,12 @@ export function initRenderer(config) {
   if (!ctx) throw new Error("Renderer init failed: canvas 2D context not available.");
 
   // Keep canvas dimensions in sync with config
-  canvas.width = config.canvasSizePx;
-  canvas.height = config.canvasSizePx;
+  const tileSize = config.grid.tileSizePx;
+  const cols = config.grid.cols;
+  const rows = config.grid.rows;
+  
+  canvas.width = cols * tileSize;
+  canvas.height = rows * tileSize;
 
   /**
    * @param {{ state:any, config:any }} args
@@ -30,8 +34,8 @@ export function initRenderer(config) {
     const gridH = grid.rows * tileSize;
 
     // Placement: center (for now)
-    const originX = Math.floor((canvas.width - gridW) / 2);
-    const originY = Math.floor((canvas.height - gridH) / 2);
+    const originX = 0;
+    const originY = 0;
 
     // Draw tiles
     for (const tile of grid.tiles) {
