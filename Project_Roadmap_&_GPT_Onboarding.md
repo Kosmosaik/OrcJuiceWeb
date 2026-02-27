@@ -3,10 +3,10 @@
 ## 1) Project Summary
 **Orcslime** is a UI-heavy simulation/management game with:
 - Real-time tick-based time system (day/month/year, seasons)
-- Base plot grid (starting 3×3)
+- Base plot grid (starting 3×3, other plots with varying size will be unlocked/conquered later)
 - Slime Trees: branch/node/fruit lifecycle, seasonal growth, progressive ripening, winter decay
 - Workers as physical entities moving on the plot grid
-- Worker assignment via UI (click worker → popup → assign Orchardist)
+- Worker assignment via UI (click worker → popup → assign different roles like Orchardist)
 - Harvesting is automatic in Autumn **only for Orchardists**
 - Inventory stores Slime Fruit (later Juice, etc.)
 - Hosted via **GitHub Pages** (no paid IDEs, no installs required)
