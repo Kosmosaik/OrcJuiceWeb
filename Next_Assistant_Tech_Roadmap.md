@@ -10,7 +10,7 @@
 - **Tile size:** `128×128` pixels, **configurable**.
 - **Coordinate system:** `(0,0)` is the **top-left** tile.
 - **Starting plot dimensions:** **configurable**, but must support:
-  - **Tree slots:** `(2,0)` and `(3,0)`  
+  - **Tree slots:** `(1,0)` and `(2,0)`  
   - **Chest slot:** `(0,2)`
 - Starting plot is a “base module” that later expands by snapping additional modules.
 
