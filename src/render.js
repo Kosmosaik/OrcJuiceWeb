@@ -90,7 +90,7 @@ function drawTileContent(ctx, tile, px, py, s) {
     ctx.fillStyle = "#7ee787";
     ctx.fillText("🌳", px + s / 2, py + s / 2 - 8);
     ctx.fillStyle = "#c9d1d9";
-    ctx.fillText("Tree", px + s / 2, py + s / 2 + 16);
+    ctx.fillText("Treeee", px + s / 2, py + s / 2 + 16);
     return;
   }
 
