@@ -1,235 +1,254 @@
 # Orcslime Web – Technical Roadmap (Next Assistant Handoff)
 
-**Context:** The project runs as a browser game hosted via GitHub Pages. We keep **ES Modules** and avoid “file://” execution; development/testing is done via the GitHub Pages URL (or any HTTP server). The goal is to build the MVP cleanly with a modular architecture, planning for persistence and future expansion.
+Context:  
+The project runs as a browser game hosted via GitHub Pages. ES Modules are used. No frameworks, no build step. Development and testing are done over HTTP (GitHub Pages or local server).
+
+The MVP is being built incrementally with strong modular boundaries and planned persistence.
 
 ---
 
-## Key Design Decisions (Locked for Now)
+# Current Status
 
-### World / Plot
-- **Tile size:** `128×128` pixels, **configurable**.
-- **Coordinate system:** `(0,0)` is the **top-left** tile.
-- **Starting plot dimensions:** **configurable**, but must support:
-  - **Tree slots:** `(1,0)` and `(2,0)`  
-  - **Chest slot:** `(0,2)`
-- Starting plot is a “base module” that later expands by snapping additional modules.
+Milestone A and Milestone B are complete.
 
-> Note: tree slots at x=3 implies plot width is at least **4** tiles. Keep plot width/height configurable, with default likely `4×3` to match `(3,0)` and `(0,2)`.
+The project now includes:
+- Modular architecture
+- Single source of truth state
+- Config-driven grid system
+- Canvas-based plot rendering
+- Time system with seasons
+- Pause functionality
+- Configurable tile size, gap, and padding
+- Configurable starting tile placements
 
-### Starting Tree
-- **Starting tree begins with 2 branches** (only branches).
-- Nodes and fruits are **not prefilled**; they grow via seasonal scheduling.
-- Growth is based on **configurable ranges** and **randomized scheduling** (spread across seasons), not “all at once”.
-
-### Tree Lifecycle (Core Rules)
-- Tree structure: **Branch → Node → Fruit**
-- Totals are computed as sums (no “branch_count × nodes_per_branch” shortcuts).
-- **Progressive ripening** in Autumn:
-  - ripening converts **unripe → ripe** (does not increase total fruit).
-- **Winter decay** affects ripe fruit.
-- Tree has **birth date**, age increments on the tree’s birthday (or equivalent model in JS).
-
-### Workers
-- Worker is a **physical entity** on the plot (simple sprite).
-- Worker assignment is via **click → DOM popup**.
-- Profession includes **Orchardist**; only Orchardists harvest in Autumn.
+Next focus: Interaction System (Path A).
 
 ---
 
-## Engineering Goals (Non-Negotiables)
-1. **ES Modules**, no global-script bundling.
-2. **No frameworks**, no build step.
-3. **Clear module boundaries** (core / world / render / ui).
-4. **Single source of truth state object** (`gameState`).
-5. **Persistence planned from day 1**:
-   - State is serializable to JSON.
-   - Avoid storing non-serializable objects inside state (e.g., canvas ctx, DOM nodes).
-6. **Deterministic-enough simulation**:
-   - Use a single RNG wrapper so we can seed later if needed.
-7. **Config-driven**:
-   - Tile size, plot size, growth ranges, ripen chance, etc. live in `config.js`.
+# Locked Design Decisions
+
+## World / Plot
+
+- Tile size: 128×128 pixels, configurable.
+- Coordinate system: (0,0) is top-left.
+- Grid dimensions: configurable via config.
+- Starting placements:
+  - Tree slots: (1,0) and (2,0)
+  - Chest slot: (0,2)
+- Grid supports configurable:
+  - tileSizePx
+  - gapPx (space between tiles)
+  - paddingPx (outer margin)
+- Canvas auto-resizes based on grid dimensions.
+
+The grid currently renders placeholder tree and chest tiles.
 
 ---
 
-## Repository Structure (Recommended)
+## Engineering Rules (Non-Negotiable)
+
+1. ES Modules only.
+2. No frameworks.
+3. No build tools.
+4. Single serializable state object.
+5. No DOM or Canvas context inside state.
+6. Renderer reads from state but never mutates it.
+7. UI reads from state and dispatches changes.
+8. Config-driven values only. No hardcoded layout values.
+9. Project must remain runnable after every milestone.
+
+---
+
+# Current Repository Structure (Actual)
 
 ```
-orcslime/
-  index.html
-  styles.css
-  /src
-    main.js
-    config.js
-    /core
-      gameLoop.js
-      rng.js
-      timeSystem.js
-      persistence.js
-      eventLog.js
-    /state
-      initialState.js
-      selectors.js
-      reducers.js
-    /world
-      plot.js
-      entities.js
-      tree.js
-      treeSystem.js
-      worker.js
-      workerSystem.js
-    /render
-      canvasRenderer.js
-      sprites.js
-      camera.js
-    /ui
-      uiRoot.js
-      panels.js
-      workerPopup.js
-      bindings.js
+index.html
+styles.css
+/src
+  main.js
+  config.js
+  state.js
+  time.js
+  grid.js
+  render.js
+  gameLoop.js
+  ui.js
 ```
 
-### Why this split
-- `/state` keeps state changes consistent (simple reducer pattern, no framework).
-- `/core` contains engine-like systems that don’t depend on rendering.
-- `/world` contains domain models + simulation logic.
-- `/render` contains Canvas drawing only.
-- `/ui` contains DOM-only logic.
+This structure is intentionally simple for MVP.  
+Subfolders may be introduced later if complexity increases.
 
 ---
 
-## State & Persistence Strategy
+# State Structure (Current Model)
 
-### Single Source of Truth
-Use one `gameState` object:
-- Serializable data only
-- No DOM elements
-- No Canvas context
-- No functions
+The single source of truth:
 
-Example:
 ```js
-gameState = {
-  meta: { version: 1 },
-  time: { day: 1, month: 1, year: 0, season: "Spring", paused: false, acc: 0 },
-  plot: { width: 4, height: 3, tileSize: 128, slots: [...] },
-  entities: {
-    trees: { byId: {}, allIds: [] },
-    workers: { byId: {}, allIds: [] },
+state = {
+  isPaused: false,
+  time: {
+    day,
+    month,
+    year,
+    season,
+    _acc
   },
-  inventory: { slimeFruit: 0 },
-  log: { entries: [] }
+  inventory: {
+    slimeFruit
+  },
+  world: {
+    grid
+  },
+  log: []
 }
 ```
 
-### Persistence
-- Implement `save()` / `load()` early (Milestone 1 or 2).
-- Store to:
-  - `localStorage` (primary MVP)
-  - Optional: export/import JSON later
-- Add a `meta.version` and migration stub:
-  - `migrateState(oldState) -> newState`
+Grid model:
+- Flat tile array
+- Each tile:
+  {
+    x,
+    y,
+    type: "empty" | "tree" | "chest"
+  }
+
+No entities yet.
 
 ---
 
-## Immediate Roadmap (Next Development Steps)
+# Updated Roadmap
 
-### Milestone A — Modularize the Current Skeleton
-**Goal:** Move logic out of `main.js` into modules without changing behavior.
-- `core/gameLoop.js`: requestAnimationFrame loop, dt, calling update/render.
-- `core/timeSystem.js`: time progression and season computation.
-- `core/eventLog.js`: append-only log, trimming.
-- `ui/uiRoot.js`: wire DOM references + render sidebar UI.
+## Milestone C – Interaction System (Next)
 
-**Acceptance:** Game still runs on GitHub Pages and time ticks.
+Goal: Allow player interaction with tiles.
 
----
+### Scope
 
-### Milestone B — Plot Data Model + Canvas Rendering
-**Goal:** Create a plot grid model and draw it.
-- `world/plot.js`:
-  - `createPlot(width,height,tileSize)`
-  - slot types: `EMPTY`, `TREE_SLOT`, `CHEST`
-  - helper: `index(x,y)` and bounds checks
-- `render/canvasRenderer.js`:
-  - draws tiles with different colors/icons
-  - draws coordinate debug text optionally (config flag)
+1. Hover detection on canvas
+2. Highlight hovered tile
+3. Click detection
+4. Selected tile state
+5. Log entry on selection
 
-**Locked placement:**
-- tree slots: `(2,0)` and `(3,0)`
-- chest slot: `(0,2)`
+### Requirements
 
-**Acceptance:** Canvas shows grid, tree slot markers, chest marker.
+- No mutation inside renderer.
+- Hit-testing logic must not live inside render.js.
+- Selection state stored inside `state`:
+  ```
+  state.ui = {
+    hoveredTile: {x,y} | null,
+    selectedTile: {x,y} | null
+  }
+  ```
+- Interaction must scale automatically with tileSizePx, gapPx, paddingPx.
 
----
+### Acceptance Criteria
 
-### Milestone C — Entity System & Starting Tree Placement
-**Goal:** Add entity registry and place the starting tree on a tree slot.
-- `world/entities.js`: create IDs, add/remove entities, lookup
-- `world/tree.js`: tree model with 2 starting branches
-- `world/treeSystem.js`: seasonal scheduling + growth + ripening + decay (config-driven)
+- Hovering a tile visually highlights it.
+- Clicking a tile selects it.
+- Selected tile visually distinct from hover.
+- Selection stored in state.
+- Log shows selection event.
 
-**Acceptance:** Tree exists in state; UI panel shows its derived totals; rendering draws a tree icon in the correct tile.
-
----
-
-### Milestone D — Worker Entity + Click + Popup Assignment
-**Goal:** Worker appears physically and is clickable.
-- `world/worker.js` + `world/workerSystem.js`
-- `ui/workerPopup.js`: show popup on click; assign profession
-- `ui/bindings.js`: canvas click hit-testing (tile or sprite bbox)
-
-**Acceptance:** Clicking worker opens popup; assigning Orchardist updates state.
+This milestone establishes the foundation for:
+- Tree interaction
+- Worker selection
+- Context panels
 
 ---
 
-### Milestone E — Autumn Auto-Harvest Loop (Orchardist Only)
-**Goal:** If worker is Orchardist, harvest in Autumn.
-- When season transitions to Autumn:
-  - worker gets a “HARVEST” task if ripe fruit exists
-  - worker moves toward tree tile (simple movement)
-  - harvest progress accumulates; on completion:
-    - remove ripe fruit from tree structure
-    - add to inventory (slimeFruit)
-    - log event
+## Milestone D – Entity Layer Introduction
 
-**Acceptance:** If not Orchardist, no harvest happens. If Orchardist, inventory increases in Autumn.
+Goal: Introduce entity registry and attach a Tree entity to tree slots.
 
----
+### Scope
 
-## Configuration Checklist (Add to `src/config.js`)
-- `tileSizePx = 128`
-- `plotWidthTiles = 4`
-- `plotHeightTiles = 3`
-- `treeSlots = [{x:2,y:0},{x:3,y:0}]`
-- `chestSlot = {x:0,y:2}`
-- Tree growth ranges (per year):
-  - `nodesPerBranchMin/Max`
-  - `fruitsPerNodeMin/Max`
-- Ripening:
-  - `ripenChancePerDay`
-- Winter decay:
-  - `winterDecayRate`
-- Debug flags:
-  - `drawTileCoords`
-  - `drawEntityIds`
+- Add entity system structure
+- Create Tree entity model
+- Place starting tree on first tree slot
+- Renderer draws tree entity (not tile placeholder)
+
+Acceptance:
+- Tree exists in state.
+- Tree rendered based on entity, not tile type.
 
 ---
 
-## Implementation Recommendations (Short)
-- Use **pure functions** for updates where practical:
-  - `nextState = reduce(state, action)` style without frameworks.
-- Keep time/season transitions centralized in `timeSystem`:
-  - emit “events” (action objects) when season changes.
-- Keep rendering stateless:
-  - renderer reads from `gameState` and draws; never mutates state.
-- Keep UI stateless:
-  - UI renders from state; interactions dispatch actions.
+## Milestone E – Tree Growth System
+
+Goal: Seasonal scheduling and growth.
+
+- Tree starts with 2 branches.
+- Nodes and fruits generated over time.
+- Ripening occurs during Autumn.
+- Winter decay removes ripe fruit.
+- All values configurable.
+
+Acceptance:
+- Tree totals computed from structure.
+- Seasonal changes affect tree state.
 
 ---
 
-## “If you are a GPT assistant” constraints
-1. Do not introduce frameworks or build tooling.
-2. Keep ES modules; assume HTTP (GitHub Pages).
-3. Respect module boundaries and state/persistence rules.
-4. Keep iterations small; ensure the project remains runnable after each step.
-5. Do not invent new gameplay beyond what’s in the GDD/discussion.
+## Milestone F – Worker Entity + Assignment
+
+Goal: Worker exists physically and is clickable.
+
+- Worker entity appears on plot.
+- Click worker to open DOM popup.
+- Assign profession (Orchardist).
+- State updates accordingly.
+
+Acceptance:
+- Worker selection works.
+- Profession stored in state.
+
+---
+
+## Milestone G – Autumn Harvest Loop
+
+Goal: Orchardist harvests ripe fruit in Autumn.
+
+- Detect season change.
+- Assign harvest task.
+- Remove ripe fruit.
+- Add to inventory.
+- Log event.
+
+Acceptance:
+- Inventory increases only if Orchardist assigned.
+
+---
+
+# Configuration Checklist (Keep Updated)
+
+In config.js:
+
+- tileSizePx
+- gapPx
+- paddingPx
+- cols
+- rows
+- startingTiles
+- Future:
+  - growth ranges
+  - ripenChancePerDay
+  - winterDecayRate
+  - debug flags
+
+---
+
+# Implementation Guidance for Future Assistants
+
+- Keep changes incremental.
+- Do not refactor architecture unless necessary.
+- Do not introduce frameworks.
+- Respect module boundaries.
+- Avoid expanding scope beyond current milestone.
+- Always maintain runnable state.
+
+---
+
+End of Roadmap
