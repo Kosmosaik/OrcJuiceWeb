@@ -47,8 +47,6 @@ orcslime/
   /assets
 ```
 
-Rule: Everything must run by opening `index.html` directly.
-
 ---
 
 ## 3) Game Loop Contract
