@@ -14,14 +14,16 @@ export function initRenderer(config) {
   const cols = config.grid.cols;
   const rows = config.grid.rows;
   
+  const pad = config.grid.paddingPx ?? 0;
+  
   const gridWidth =
     cols * tileSize + (cols - 1) * gap;
   
   const gridHeight =
     rows * tileSize + (rows - 1) * gap;
   
-  canvas.width = gridWidth;
-  canvas.height = gridHeight;
+  canvas.width = gridWidth + pad * 2;
+  canvas.height = gridHeight + pad * 2;
 
   /**
    * @param {{ state:any, config:any }} args
@@ -37,19 +39,20 @@ export function initRenderer(config) {
     const tileSize = config.grid.tileSizePx;
     const gap = config.grid.gapPx ?? 0;
     const step = tileSize + gap;
+    const pad = config.grid.paddingPx ?? 0;
 
     // Compute pixel size of grid
     const gridW = grid.cols * tileSize;
     const gridH = grid.rows * tileSize;
 
     // Placement: center (for now)
-    const originX = 0;
-    const originY = 0;
+    const originX = pad;
+    const originY = pad;
 
     // Draw tiles
     for (const tile of grid.tiles) {
-      const x = tile.x * step;
-      const y = tile.y * step;
+      const x = originX + tile.x * step;
+      const y = originY + tile.y * step;
 
     // Tile background
     ctx.fillStyle = "#15191f";
