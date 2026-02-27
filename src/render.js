@@ -10,11 +10,18 @@ export function initRenderer(config) {
 
   // Keep canvas dimensions in sync with config
   const tileSize = config.grid.tileSizePx;
+  const gap = config.grid.gapPx ?? 0;
   const cols = config.grid.cols;
   const rows = config.grid.rows;
   
-  canvas.width = cols * tileSize;
-  canvas.height = rows * tileSize;
+  const gridWidth =
+    cols * tileSize + (cols - 1) * gap;
+  
+  const gridHeight =
+    rows * tileSize + (rows - 1) * gap;
+  
+  canvas.width = gridWidth;
+  canvas.height = gridHeight;
 
   /**
    * @param {{ state:any, config:any }} args
