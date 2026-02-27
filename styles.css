@@ -23,6 +23,7 @@ body {
 
 #sidebar {
   padding: 12px;
+  width: 340px;
   border-right: 1px solid var(--border);
   overflow: auto;
 }
@@ -86,4 +87,5 @@ button:hover {
   font-size: 12px;
 
 }
+
 
