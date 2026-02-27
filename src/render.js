@@ -72,17 +72,17 @@ function drawTileContent(ctx, tile, px, py, s) {
   if (tile.type === "tree") {
     // simple icon + label
     ctx.fillStyle = "#7ee787";
-    ctx.fillText("🌳", px + s / 2, py + s / 2 - 10);
+    ctx.fillText("🌳", px + s / 2, py + s / 2 - 8);
     ctx.fillStyle = "#c9d1d9";
-    ctx.fillText("Tree", px + s / 2, py + s / 2 + 14);
+    ctx.fillText("Tree", px + s / 2, py + s / 2 + 16);
     return;
   }
 
   if (tile.type === "chest") {
     ctx.fillStyle = "#ffdf5d";
-    ctx.fillText("📦", px + s / 2, py + s / 2 - 10);
+    ctx.fillText("📦", px + s / 2, py + s / 2 - 8);
     ctx.fillStyle = "#c9d1d9";
-    ctx.fillText("Chest", px + s / 2, py + s / 2 + 14);
+    ctx.fillText("Chest", px + s / 2, py + s / 2 + 16);
     return;
   }
 
